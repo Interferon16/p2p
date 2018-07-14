@@ -1,4 +1,4 @@
-package com.simple_p2p.controller;
+package com.simple_p2p.p2p_engine;
 
 
 import com.simple_p2p.model.ChatMessage;
@@ -13,14 +13,13 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
-@Controller
 public class P2PEngine {
     private Server server;
     private Client client;
     private ChannelGroup channelGroup;
 
     public P2PEngine() throws Exception {
-        //run();
+
     }
 
     public P2PEngine run() throws Exception {
@@ -30,28 +29,5 @@ public class P2PEngine {
         this.channelGroup = this.server.getChannelGroup();
         return this;
     }
-
-    @MessageMapping("/chat.sendMessage")
-    @SendTo("/topic/public")
-    public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
-        sendMessageToAllConnections(chatMessage);
-        return chatMessage;
-    }
-
-    private void sendMessageToAllConnections(ChatMessage chatMessage) {
-        Message message = MessageFactory.createTextMessageInstance();
-        message.setFrom(chatMessage.getSender());
-        message.setMessage(chatMessage.getContent());
-        channelGroup.writeAndFlush(message.getMessage());
-    }
-
-
-    @MessageMapping("/chat.addUser")
-    @SendTo("/topic/public")
-    public ChatMessage addUser(@Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
-        headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
-        return chatMessage;
-    }
-
 
 }

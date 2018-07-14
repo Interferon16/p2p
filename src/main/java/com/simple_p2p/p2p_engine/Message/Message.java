@@ -14,21 +14,8 @@ public class Message implements Serializable {
     private int hash;
     private long timeStamp;
 
-    private Message() {
-    }
+    public Message() {
 
-    public Message createTextMessageInstance() {
-        this.type = MessageType.TEXT;
-        this.timeStamp = System.currentTimeMillis();
-        return this;
-    }
-
-    public Message createDataPacketInstance() {
-        this.type = MessageType.DATA;
-        this.dataBuff = new byte[8 * 1024];
-        this.dataBuffCapacity = 8 * 1024;
-        this.timeStamp = System.currentTimeMillis();
-        return this;
     }
 
     public void setDataBuffCapacity(int data_size) {
@@ -90,6 +77,10 @@ public class Message implements Serializable {
 
     public void createHash(int hash) {
         this.hash = this.hashCode();
+    }
+
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
     public long getTimeStamp() {

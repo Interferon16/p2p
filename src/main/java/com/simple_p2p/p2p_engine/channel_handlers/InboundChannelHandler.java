@@ -21,9 +21,6 @@ public class InboundChannelHandler extends ChannelInboundHandlerAdapter {
         super.channelRegistered(ctx);
         channelGroup.add(ctx.channel());
         logger.info("Channel add" + ctx.channel().toString());
-/*        for(Channel c:channelGroup){
-            System.out.println(c);
-        }*/
     }
 
     @Override

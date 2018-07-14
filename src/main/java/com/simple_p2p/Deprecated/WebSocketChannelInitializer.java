@@ -1,5 +1,6 @@
-package com.simple_p2p.p2p_engine.channel_handlers;
+package com.simple_p2p.Deprecated;
 
+import com.simple_p2p.p2p_engine.channel_handlers.HttpServerHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.group.ChannelGroup;

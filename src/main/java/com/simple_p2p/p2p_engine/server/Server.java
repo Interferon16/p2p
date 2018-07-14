@@ -40,10 +40,15 @@ public class Server {
         this.channelGroup = new DefaultChannelGroup(new DefaultEventExecutor());
     }
 
-    public void run() throws Exception {
+    public void run() {
         getMyInfo();
         showMyInfo();
-        startServer();
+        try {
+            startServer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void getMyInfo() {
@@ -86,4 +91,11 @@ public class Server {
         }
     }
 
+    public Client getClient(){
+        return client;
+    }
+
+    public ChannelGroup getChannelGroup() {
+        return channelGroup;
+    }
 }

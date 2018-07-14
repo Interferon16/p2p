@@ -1,6 +1,6 @@
-package com.simple_p2p.p2p_engine.webserver;
+package com.simple_p2p.Deprecated.webserver;
 
-import com.simple_p2p.p2p_engine.channel_handlers.WebSocketChannelInitializer;
+import com.simple_p2p.Deprecated.WebSocketChannelInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;

@@ -1,5 +1,6 @@
 package com.simple_p2p.p2p_engine.channel_handlers;
 
+import com.simple_p2p.Deprecated.WebSocketHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.FullHttpMessage;
