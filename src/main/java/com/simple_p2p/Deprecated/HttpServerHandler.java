@@ -1,4 +1,4 @@
-package com.simple_p2p.p2p_engine.channel_handlers;
+package com.simple_p2p.Deprecated;
 
 import com.simple_p2p.Deprecated.WebSocketHandler;
 import io.netty.channel.ChannelHandlerContext;

@@ -1,5 +1,9 @@
 package com.simple_p2p.p2p_engine.server;
 
+import com.simple_p2p.p2p_engine.Utils.HashWork;
+import com.simple_p2p.p2p_engine.Utils.NetworkEnvironment;
+import com.simple_p2p.p2p_engine.channel_handlers.ServerChannelInitializer;
+import com.simple_p2p.p2p_engine.client.Client;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -9,20 +13,15 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.DefaultEventExecutor;
-import com.simple_p2p.p2p_engine.Utils.HashWork;
-import com.simple_p2p.p2p_engine.Utils.NetworkEnvironment;
-import com.simple_p2p.p2p_engine.channel_handlers.CommonChannelInitializer;
-import com.simple_p2p.p2p_engine.client.Client;
-import org.jboss.logging.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 
-public class Server {
+public class Server implements Runnable{
 
     private int port;
     private Channel listenerChannel;
-    private Logger logger;
     private ChannelGroup channelGroup;
     private Client client;
     private String myHash;
@@ -30,13 +29,14 @@ public class Server {
     private String localMacAddress;
     private InetAddress externalAddress;
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     public Server() {
-        this(16161);
+
     }
 
     public Server(int port) {
         this.port = port;
-        this.logger = Logger.getLogger(Server.class.getName());
         this.channelGroup = new DefaultChannelGroup(new DefaultEventExecutor());
     }
 
@@ -58,44 +58,83 @@ public class Server {
         this.externalAddress = NetworkEnvironment.getExternalAddress();
     }
 
-    private void showMyInfo(){
-        logger.infof("My hash: "+myHash);
-        logger.infof("My local address: "+localAddress+" | mac address: "+localMacAddress);
-        logger.infof("My external address: "+externalAddress);
+    private void showMyInfo() {
+        logger.info("My hash: " + myHash);
+        logger.info("My local address: " + localAddress + " | mac address: " + localMacAddress);
+        logger.info("My external address: " + externalAddress);
     }
 
     private void startServer() throws Exception {
-        logger.info("server start");
         EventLoopGroup listener = new NioEventLoopGroup();
-        EventLoopGroup connections = new NioEventLoopGroup();
+        EventLoopGroup connectionsLoop = new NioEventLoopGroup();
         try {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
-            serverBootstrap.group(listener, connections);
+            serverBootstrap.group(listener, connectionsLoop);
             serverBootstrap.channel(NioServerSocketChannel.class);
             serverBootstrap.option(ChannelOption.SO_BACKLOG, 128);
             serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
-            serverBootstrap.childHandler(new CommonChannelInitializer(channelGroup));
+            serverBootstrap.childHandler(new ServerChannelInitializer(channelGroup));
+            boolean listenerBind = false;
+            port--;
+            int connectionPortCounts = 100;
+            while (!listenerBind) {
+                if(connectionPortCounts<1){
+                    logger.error("All using port is bind or restricted, check network policy or multiple client is running");
+                    System.exit(1);
 
-            listenerChannel = serverBootstrap.bind(port).sync().channel();
+                }
+                connectionPortCounts--;
+                port++;
+                try {
+                    listenerChannel = serverBootstrap.bind(port).sync().channel();
+                    listenerBind = true;
+                    logger.info("Listener is bind on port: "+port);
+                } catch (Exception e) {
+                    logger.warn("Port: " + port + " is already in use try another one");
+                }
+            }
 
-            client = new Client(channelGroup, connections);
-            client.run();
+            logger.info("Server start");
+            client = startClient(channelGroup,connectionsLoop);
+
+
+
 
 
             listenerChannel.closeFuture().sync();
         } finally {
-            connections.shutdownGracefully();
+            connectionsLoop.shutdownGracefully();
             listener.shutdownGracefully();
 
 
         }
     }
 
-    public Client getClient(){
+    private Client startClient(ChannelGroup channelGroup, EventLoopGroup connectionsLoop){
+        client = new Client(channelGroup, connectionsLoop);
+        try {
+            client.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return client;
+    }
+
+
+
+    public Client getClient() {
         return client;
     }
 
     public ChannelGroup getChannelGroup() {
         return channelGroup;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 }

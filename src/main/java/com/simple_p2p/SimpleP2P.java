@@ -1,16 +1,17 @@
 package com.simple_p2p;
 
+import com.simple_p2p.p2p_engine.p2pcontrol.impl.P2PServerControlImpl;
+import com.simple_p2p.p2p_engine.p2pcontrol.interfaces.P2PServerControl;
 import com.simple_p2p.p2p_engine.server.Server;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
+import com.simple_p2p.p2p_engine.server.ServerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class SimpleP2P implements CommandLineRunner {
+public class SimpleP2P {
 
-	private Server server;
+	private static Server server;
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(SimpleP2P.class, args);
@@ -18,12 +19,13 @@ public class SimpleP2P implements CommandLineRunner {
 
 	@Bean
 	public Server runP2PEngine(){
-		this.server = new Server(16161);
-		return this.server;
+		server = ServerFactory.getServerInstance(16161);
+		return server;
 	}
 
-	@Override
-	public void run(String... args) throws Exception {
-		this.server.run();
+	@Bean
+	public P2PServerControl p2PServerControl(){
+		P2PServerControl serverControl = new P2PServerControlImpl();
+		return serverControl;
 	}
 }

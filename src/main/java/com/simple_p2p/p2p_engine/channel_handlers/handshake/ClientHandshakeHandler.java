@@ -1,4 +1,4 @@
-package com.simple_p2p.p2p_engine.channel_handlers;
+package com.simple_p2p.p2p_engine.channel_handlers.handshake;
 
 import com.simple_p2p.p2p_engine.Message.Message;
 import com.simple_p2p.p2p_engine.Message.MessageFactory;

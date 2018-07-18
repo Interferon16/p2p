@@ -1,4 +1,4 @@
-package com.simple_p2p.p2p_engine.channel_handlers;
+package com.simple_p2p.p2p_engine.channel_handlers.handshake;
 
 import com.simple_p2p.p2p_engine.Message.Message;
 import com.simple_p2p.p2p_engine.Message.MessageType;
@@ -14,6 +14,8 @@ public class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
     private ChannelGroup channelGroup;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private HandlerType handlerType;
+    private boolean handshakeTrue = false;
+
     public enum HandlerType{
         SERVER,
         CLIENT};
@@ -42,8 +44,10 @@ public class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (cause instanceof ReadTimeoutException) {
-            logger.warn("Connection dropped by timeout");
-            ctx.channel().close().awaitUninterruptibly();
+            if (!handshakeTrue){
+                logger.warn("Connection dropped by timeout");
+                ctx.channel().close().awaitUninterruptibly();
+            }
         } else {
             super.exceptionCaught(ctx, cause);
         }
@@ -54,6 +58,7 @@ public class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
         channelGroup.add(ctx.channel());
         logger.info("Channel add" + ctx.channel().toString());
         ctx.channel().pipeline().remove(ReadTimeoutHandler.class);
+        this.handshakeTrue = true;
         if(this.handlerType==HandlerType.SERVER){
             message.setMessage("Hello back");
             ctx.writeAndFlush(message);

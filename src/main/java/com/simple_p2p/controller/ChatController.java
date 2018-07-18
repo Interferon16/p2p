@@ -3,6 +3,7 @@ package com.simple_p2p.controller;
 import com.simple_p2p.model.ChatMessage;
 import com.simple_p2p.p2p_engine.Message.Message;
 import com.simple_p2p.p2p_engine.Message.MessageFactory;
+import com.simple_p2p.p2p_engine.p2pcontrol.interfaces.P2PServerControl;
 import com.simple_p2p.p2p_engine.server.Server;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -20,12 +21,12 @@ import java.nio.charset.Charset;
 public class ChatController {
 
     @Autowired
-    private Server server;
+    private P2PServerControl p2PServerControl;
 
     @MessageMapping("/chat.sendMessage")
     @SendTo("/topic/public")
     public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
-        sendMessageToAllConnections(chatMessage);
+        p2PServerControl.sendMessageToAllConnect(chatMessage);
         return chatMessage;
     }
 
@@ -34,16 +35,6 @@ public class ChatController {
     public ChatMessage addUser(@Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
         headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
         return chatMessage;
-    }
-
-    private void sendMessageToAllConnections(ChatMessage chatMessage) {
-        System.out.println("sgdgsgs");
-        Message message = MessageFactory.createTextMessageInstance();
-        message.setFrom(chatMessage.getSender());
-        message.setMessage(chatMessage.getContent());
-        String finMess = message.getFrom()+" say: "+message.getMessage()+"\n";
-        ByteBuf byteMess = Unpooled.copiedBuffer(finMess.getBytes(Charset.forName("UTF8")));
-        this.server.getChannelGroup().writeAndFlush(byteMess);
     }
 
 }

@@ -1,7 +1,5 @@
-package com.simple_p2p.p2p_engine.channel_handlers;
+package com.simple_p2p.p2p_engine.channel_handlers.handshake;
 
-import com.simple_p2p.p2p_engine.Message.Message;
-import com.simple_p2p.p2p_engine.Message.MessageFactory;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.group.ChannelGroup;
 import org.slf4j.Logger;

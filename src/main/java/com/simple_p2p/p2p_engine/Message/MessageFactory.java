@@ -16,4 +16,11 @@ public class MessageFactory {
         message.setTimeStamp(System.currentTimeMillis());
         return message;
     }
+
+    public static Message createHandshakeInstance() {
+        Message message = new Message();
+        message.setType(MessageType.HANDSHAKE);
+        message.setTimeStamp(System.currentTimeMillis());
+        return message;
+    }
 }
