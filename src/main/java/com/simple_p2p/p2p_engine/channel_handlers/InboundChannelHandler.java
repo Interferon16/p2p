@@ -22,7 +22,7 @@ public class InboundChannelHandler extends ChannelInboundHandlerAdapter {
         logger.info(message.getMessage());
         for(Channel c:channelGroup){
             if(c!=ctx.channel()){
-                c.writeAndFlush("[" + ctx.channel().remoteAddress() + "] " + msg + '\n');
+                c.writeAndFlush(msg);
             }
         }
         ctx.fireChannelRead(msg);
