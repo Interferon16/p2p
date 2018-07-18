@@ -15,8 +15,12 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.DefaultEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server implements Runnable{
 
@@ -28,6 +32,8 @@ public class Server implements Runnable{
     private InetAddress localAddress;
     private String localMacAddress;
     private InetAddress externalAddress;
+    private CopyOnWriteArrayList<Integer> messagesHashBuffer;
+    private SimpMessageSendingOperations simpMessagingTemplate;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -35,9 +41,11 @@ public class Server implements Runnable{
 
     }
 
-    public Server(int port) {
+    public Server(int port,SimpMessageSendingOperations simpMessagingTemplate) {
         this.port = port;
         this.channelGroup = new DefaultChannelGroup(new DefaultEventExecutor());
+        messagesHashBuffer = new CopyOnWriteArrayList<>();
+        this.simpMessagingTemplate=simpMessagingTemplate;
     }
 
     public void run() {
@@ -73,7 +81,7 @@ public class Server implements Runnable{
             serverBootstrap.channel(NioServerSocketChannel.class);
             serverBootstrap.option(ChannelOption.SO_BACKLOG, 128);
             serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
-            serverBootstrap.childHandler(new ServerChannelInitializer(channelGroup));
+            serverBootstrap.childHandler(new ServerChannelInitializer(channelGroup,messagesHashBuffer,simpMessagingTemplate));
             boolean listenerBind = false;
             port--;
             int connectionPortCounts = 100;
@@ -95,7 +103,7 @@ public class Server implements Runnable{
             }
 
             logger.info("Server start");
-            client = startClient(channelGroup,connectionsLoop);
+            client = startClient(channelGroup,connectionsLoop,messagesHashBuffer,simpMessagingTemplate);
 
 
 
@@ -110,8 +118,8 @@ public class Server implements Runnable{
         }
     }
 
-    private Client startClient(ChannelGroup channelGroup, EventLoopGroup connectionsLoop){
-        client = new Client(channelGroup, connectionsLoop);
+    private Client startClient(ChannelGroup channelGroup, EventLoopGroup connectionsLoop,CopyOnWriteArrayList<Integer> messagesHashBuffer,SimpMessageSendingOperations simpMessagingTemplate){
+        client = new Client(channelGroup, connectionsLoop,messagesHashBuffer,simpMessagingTemplate);
         try {
             client.run();
         } catch (Exception e) {

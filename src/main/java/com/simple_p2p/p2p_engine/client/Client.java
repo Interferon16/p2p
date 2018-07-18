@@ -11,8 +11,10 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 
 import java.net.InetAddress;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class Client {
@@ -21,12 +23,16 @@ public class Client {
     private Bootstrap clientBootstrap;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private InetAddress localAddress;
+    private CopyOnWriteArrayList<Integer> messagesHashBuffer;
+    private SimpMessageSendingOperations simpMessagingTemplate;
 
 
-    public Client(ChannelGroup channelGroup, EventLoopGroup connectionsLoop) {
+    public Client(ChannelGroup channelGroup, EventLoopGroup connectionsLoop,CopyOnWriteArrayList<Integer> messagesHashBuffer,SimpMessageSendingOperations simpMessagingTemplate) {
         this.channelGroup = channelGroup;
         this.connectionsLoop = connectionsLoop;
         this.localAddress = NetworkEnvironment.getLocalAddress();
+        this.messagesHashBuffer=messagesHashBuffer;
+        this.simpMessagingTemplate=simpMessagingTemplate;
 
     }
 
@@ -35,7 +41,7 @@ public class Client {
         clientBootstrap.group(connectionsLoop);
         clientBootstrap.channel(NioSocketChannel.class);
         clientBootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 500);
-        clientBootstrap.handler(new ClientChannelInitializer(channelGroup));
+        clientBootstrap.handler(new ClientChannelInitializer(channelGroup,messagesHashBuffer,simpMessagingTemplate));
         logger.info("Client start");
         connectOnStart();
     }
@@ -57,13 +63,12 @@ public class Client {
         ChannelFuture channelFuture=clientBootstrap.connect(address, port);
         channelFuture.awaitUninterruptibly();
 
-        // Now we are sure the future is completed.
         assert channelFuture.isDone();
 
         if (channelFuture.isCancelled()) {
-            // Connection attempt cancelled by user
+
         } else if (!channelFuture.isSuccess()) {
-            //channelFuture.cause().printStackTrace();
+
             logger.info("Connection is failed to "+address+":"+port);
             channelFuture.channel().close().awaitUninterruptibly();
         } else {

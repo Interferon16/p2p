@@ -28,6 +28,7 @@ public class ClientHandshakeHandler extends AbstractHandshakeHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         super.channelRead(ctx, msg);
+        ctx.channel().pipeline().remove(ClientHandshakeHandler.class);
     }
 
     @Override

@@ -36,7 +36,7 @@ public class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
             }
         }else{
             ctx.channel().close().awaitUninterruptibly();
-            logger.warn("Handshake with "+ctx.channel().remoteAddress().toString()+"don't received, connection dropped");
+            logger.warn("Handshake with "+ctx.channel().remoteAddress().toString()+" don't received, connection dropped");
         }
         //ctx.fireChannelRead(msg);
     }
@@ -44,7 +44,7 @@ public class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (cause instanceof ReadTimeoutException) {
-            if (!handshakeTrue){
+            if (!this.handshakeTrue){
                 logger.warn("Connection dropped by timeout");
                 ctx.channel().close().awaitUninterruptibly();
             }
@@ -59,6 +59,7 @@ public class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
         logger.info("Channel add" + ctx.channel().toString());
         ctx.channel().pipeline().remove(ReadTimeoutHandler.class);
         this.handshakeTrue = true;
+        logger.warn(String.valueOf(handshakeTrue));
         if(this.handlerType==HandlerType.SERVER){
             message.setMessage("Hello back");
             ctx.writeAndFlush(message);
