@@ -16,10 +16,7 @@ public class P2PServerControlImpl implements P2PServerControl{
     private ChannelGroup connectedChannelsGroup;
 
 
-
-
-    @Autowired
-    public void P2PServerControl(Server server){
+    public P2PServerControlImpl(Server server){
         this.client = server.getClient();
         this.connectedChannelsGroup=server.getChannelGroup();
         this.server=server;

@@ -1,7 +1,7 @@
 package com.simple_p2p.p2p_engine.client;
 
 import com.simple_p2p.p2p_engine.Utils.NetworkEnvironment;
-import com.simple_p2p.p2p_engine.channel_handlers.ClientChannelInitializer;
+import com.simple_p2p.p2p_engine.channels_inits.ClientChannelInitializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -47,7 +47,7 @@ public class Client {
     }
 
     private void connectOnStart(){
-        for(int i=84;i<97;i++){
+        for(int i=80;i<87;i++){
             int startPort = 16160;
             for(int j=0;j<2;j++){
                 startPort++;

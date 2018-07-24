@@ -5,7 +5,7 @@ public class MessageFactory {
     public static Message createTextMessageInstance() {
         Message message = new Message();
         message.setType(MessageType.TEXT);
-        message.setTimeStamp(System.currentTimeMillis());
+        //message.setTimeStamp(System.currentTimeMillis());
         return message;
     }
 
@@ -13,14 +13,14 @@ public class MessageFactory {
         Message message = new Message();
         message.setType(MessageType.DATA);
         message.setDataBuffCapacity(8 * 1024);
-        message.setTimeStamp(System.currentTimeMillis());
+        //message.setTimeStamp(System.currentTimeMillis());
         return message;
     }
 
     public static Message createHandshakeInstance() {
         Message message = new Message();
         message.setType(MessageType.HANDSHAKE);
-        message.setTimeStamp(System.currentTimeMillis());
+        //message.setTimeStamp(System.currentTimeMillis());
         return message;
     }
 }

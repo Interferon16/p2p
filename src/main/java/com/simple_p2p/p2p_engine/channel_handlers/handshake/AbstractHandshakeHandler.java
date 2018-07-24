@@ -54,12 +54,10 @@ public class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
     }
 
     private boolean processingHandshake(Message message,ChannelHandlerContext ctx){
-        logger.info(message.getMessage());
         channelGroup.add(ctx.channel());
         logger.info("Channel add" + ctx.channel().toString());
         ctx.channel().pipeline().remove(ReadTimeoutHandler.class);
         this.handshakeTrue = true;
-        logger.warn(String.valueOf(handshakeTrue));
         if(this.handlerType==HandlerType.SERVER){
             message.setMessage("Hello back");
             ctx.writeAndFlush(message);

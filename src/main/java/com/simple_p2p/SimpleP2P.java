@@ -13,7 +13,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 @SpringBootApplication
 public class SimpleP2P {
 
-	private static Server server;
+	private static P2PServerControl serverControl;
 
 	@Autowired
 	private SimpMessageSendingOperations messagingTemplate;
@@ -23,14 +23,9 @@ public class SimpleP2P {
 	}
 
 	@Bean
-	public Server runP2PEngine(){
-		server = ServerFactory.getServerInstance(16161,this.messagingTemplate);
-		return server;
-	}
-
-	@Bean
 	public P2PServerControl p2PServerControl(){
-		P2PServerControl serverControl = new P2PServerControlImpl();
+		Server server = ServerFactory.getServerInstance(16161,this.messagingTemplate);
+		P2PServerControl serverControl = new P2PServerControlImpl(server);
 		return serverControl;
 	}
 }

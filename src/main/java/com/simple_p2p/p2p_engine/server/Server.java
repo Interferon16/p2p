@@ -2,7 +2,7 @@ package com.simple_p2p.p2p_engine.server;
 
 import com.simple_p2p.p2p_engine.Utils.HashWork;
 import com.simple_p2p.p2p_engine.Utils.NetworkEnvironment;
-import com.simple_p2p.p2p_engine.channel_handlers.ServerChannelInitializer;
+import com.simple_p2p.p2p_engine.channels_inits.ServerChannelInitializer;
 import com.simple_p2p.p2p_engine.client.Client;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -16,10 +16,8 @@ import io.netty.util.concurrent.DefaultEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server implements Runnable{

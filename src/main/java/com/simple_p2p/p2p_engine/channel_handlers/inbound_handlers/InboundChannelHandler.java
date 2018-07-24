@@ -1,4 +1,4 @@
-package com.simple_p2p.p2p_engine.channel_handlers;
+package com.simple_p2p.p2p_engine.channel_handlers.inbound_handlers;
 
 import com.simple_p2p.p2p_engine.Message.Message;
 import io.netty.channel.Channel;
@@ -18,11 +18,13 @@ public class InboundChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        Message message = (Message) msg;
-        logger.info(message.getMessage());
-        for(Channel c:channelGroup){
-            if(c!=ctx.channel()){
-                c.writeAndFlush(msg);
+        if (msg instanceof Message) {
+            Message message = (Message) msg;
+            logger.info(message.getMessage());
+            for (Channel c : channelGroup) {
+                if (c != ctx.channel()) {
+                    c.writeAndFlush(msg);
+                }
             }
         }
         ctx.fireChannelRead(msg);

@@ -1,4 +1,4 @@
-package com.simple_p2p.p2p_engine.channel_handlers;
+package com.simple_p2p.p2p_engine.channel_handlers.inbound_handlers;
 
 
 import com.simple_p2p.p2p_engine.Message.Message;
