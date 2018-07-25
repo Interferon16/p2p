@@ -5,6 +5,7 @@ import com.simple_p2p.p2p_engine.channel_handlers.inbound_handlers.InboundChanne
 import com.simple_p2p.p2p_engine.channel_handlers.inbound_handlers.ToWebFaceHandler;
 import com.simple_p2p.p2p_engine.channel_handlers.handshake.ClientHandshakeHandler;
 import com.simple_p2p.p2p_engine.channel_handlers.outbound_handlers.MessageUpdaterOutboundHandler;
+import com.simple_p2p.p2p_engine.server.Settings;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.group.ChannelGroup;
@@ -18,14 +19,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ClientChannelInitializer extends ChannelInitializer {
 
-    private ChannelGroup channelGroup;
-    private CopyOnWriteArrayList<Integer> messagesHashBuffer;
-    SimpMessageSendingOperations simpMessagingTemplate;
+    private Settings settings;
 
-    public ClientChannelInitializer(ChannelGroup channelGroup,CopyOnWriteArrayList<Integer> messagesHashBuffer,SimpMessageSendingOperations simpMessagingTemplate){
-        this.channelGroup=channelGroup;
-        this.messagesHashBuffer=messagesHashBuffer;
-        this.simpMessagingTemplate=simpMessagingTemplate;
+    public ClientChannelInitializer(Settings settings){
+        this.settings=settings;
     }
     @Override
     protected void initChannel(Channel channel) throws Exception {
@@ -33,9 +30,9 @@ public class ClientChannelInitializer extends ChannelInitializer {
         channel.pipeline().addLast("deserialization",new ObjectDecoder(ClassResolvers.weakCachingResolver(null)));
         channel.pipeline().addLast("serialization",new ObjectEncoder());
         channel.pipeline().addLast("Add timestamp and hash",new MessageUpdaterOutboundHandler());
-        channel.pipeline().addLast(new ClientHandshakeHandler(channelGroup));
-        channel.pipeline().addLast(new DuplicatedMessageHandler(messagesHashBuffer));
-        channel.pipeline().addLast(new InboundChannelHandler(channelGroup));
-        channel.pipeline().addLast(new ToWebFaceHandler(simpMessagingTemplate));
+        channel.pipeline().addLast(new ClientHandshakeHandler(settings.getConnectedChannelGroup()));
+        channel.pipeline().addLast(new DuplicatedMessageHandler(settings.getMessagesHashBuffer()));
+        channel.pipeline().addLast(new InboundChannelHandler(settings.getConnectedChannelGroup()));
+        channel.pipeline().addLast(new ToWebFaceHandler(settings.getMessagingTemplate()));
     }
 }

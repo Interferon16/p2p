@@ -4,23 +4,22 @@ import com.simple_p2p.p2p_engine.Utils.HashWork;
 import com.simple_p2p.p2p_engine.Utils.NetworkEnvironment;
 import com.simple_p2p.p2p_engine.channels_inits.ServerChannelInitializer;
 import com.simple_p2p.p2p_engine.client.Client;
+import com.simple_p2p.p2p_engine.timeevents.RefreshAliveStatusFromChannels;
+import com.simple_p2p.p2p_engine.timeevents.SendAliveMessageEvent;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.util.concurrent.DefaultEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 
 import java.net.InetAddress;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Timer;
 
-public class Server implements Runnable{
+public class Server implements Runnable {
 
     private int port;
     private Channel listenerChannel;
@@ -30,8 +29,8 @@ public class Server implements Runnable{
     private InetAddress localAddress;
     private String localMacAddress;
     private InetAddress externalAddress;
-    private CopyOnWriteArrayList<Integer> messagesHashBuffer;
-    private SimpMessageSendingOperations simpMessagingTemplate;
+    private Settings settings;
+    private Timer timeEvents;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -39,11 +38,10 @@ public class Server implements Runnable{
 
     }
 
-    public Server(int port,SimpMessageSendingOperations simpMessagingTemplate) {
-        this.port = port;
-        this.channelGroup = new DefaultChannelGroup(new DefaultEventExecutor());
-        messagesHashBuffer = new CopyOnWriteArrayList<>();
-        this.simpMessagingTemplate=simpMessagingTemplate;
+    public Server(Settings settings) {
+        this.settings = settings;
+        this.port = settings.getListener_port();
+        this.timeEvents = new Timer();
     }
 
     public void run() {
@@ -62,6 +60,10 @@ public class Server implements Runnable{
         this.localAddress = NetworkEnvironment.getLocalAddress();
         this.localMacAddress = NetworkEnvironment.getLocalMacAddressReadable();
         this.externalAddress = NetworkEnvironment.getExternalAddress();
+        settings.setMyHash(myHash);
+        settings.setLocalAddress(localAddress);
+        settings.setLocalMacAddress(localMacAddress);
+        settings.setExternalAddress(externalAddress);
     }
 
     private void showMyInfo() {
@@ -79,12 +81,12 @@ public class Server implements Runnable{
             serverBootstrap.channel(NioServerSocketChannel.class);
             serverBootstrap.option(ChannelOption.SO_BACKLOG, 128);
             serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
-            serverBootstrap.childHandler(new ServerChannelInitializer(channelGroup,messagesHashBuffer,simpMessagingTemplate));
+            serverBootstrap.childHandler(new ServerChannelInitializer(settings));
             boolean listenerBind = false;
             port--;
             int connectionPortCounts = 100;
             while (!listenerBind) {
-                if(connectionPortCounts<1){
+                if (connectionPortCounts < 1) {
                     logger.error("All using port is bind or restricted, check network policy or multiple client is running");
                     System.exit(1);
 
@@ -94,17 +96,17 @@ public class Server implements Runnable{
                 try {
                     listenerChannel = serverBootstrap.bind(port).sync().channel();
                     listenerBind = true;
-                    logger.info("Listener is bind on port: "+port);
+                    logger.info("Listener is bind on port: " + port);
                 } catch (Exception e) {
                     logger.warn("Port: " + port + " is already in use try another one");
                 }
             }
 
             logger.info("Server start");
-            client = startClient(channelGroup,connectionsLoop,messagesHashBuffer,simpMessagingTemplate);
+            client = startClient(connectionsLoop, settings);
 
-
-
+            timeEvents.scheduleAtFixedRate(new SendAliveMessageEvent(settings.getConnectedChannelGroup()), 5000, 5000);
+            timeEvents.scheduleAtFixedRate(new RefreshAliveStatusFromChannels(settings.getConnectedChannelGroup()), 20000, 20000);
 
 
             listenerChannel.closeFuture().sync();
@@ -116,8 +118,8 @@ public class Server implements Runnable{
         }
     }
 
-    private Client startClient(ChannelGroup channelGroup, EventLoopGroup connectionsLoop,CopyOnWriteArrayList<Integer> messagesHashBuffer,SimpMessageSendingOperations simpMessagingTemplate){
-        client = new Client(channelGroup, connectionsLoop,messagesHashBuffer,simpMessagingTemplate);
+    private Client startClient(EventLoopGroup connectionsLoop, Settings settings) {
+        client = new Client(connectionsLoop, settings);
         try {
             client.run();
         } catch (Exception e) {
@@ -125,7 +127,6 @@ public class Server implements Runnable{
         }
         return client;
     }
-
 
 
     public Client getClient() {

@@ -6,13 +6,12 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 
 public class MessageUpdaterOutboundHandler extends ChannelOutboundHandlerAdapter{
-/*    @Override
+    @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         if(msg instanceof Message){
             Message message = (Message)msg;
             message.setTimeStamp(System.currentTimeMillis());
-            message.hashCode();
         }
         super.write(ctx, msg, promise);
-    }*/
+    }
 }

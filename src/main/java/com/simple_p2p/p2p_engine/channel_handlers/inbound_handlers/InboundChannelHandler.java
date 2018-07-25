@@ -5,12 +5,16 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.group.ChannelGroup;
+import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InboundChannelHandler extends ChannelInboundHandlerAdapter {
     private ChannelGroup channelGroup;
+    private AttributeKey<String> userHash;
+    private AttributeKey<Boolean> isAlive;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
     public InboundChannelHandler(ChannelGroup channelGroup) {
         this.channelGroup = channelGroup;
@@ -20,6 +24,11 @@ public class InboundChannelHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof Message) {
             Message message = (Message) msg;
+            switch (message.getType()){
+                case PING:updateAliveStatus(message.getFrom());
+
+                default:break;
+            }
             logger.info(message.getMessage());
             for (Channel c : channelGroup) {
                 if (c != ctx.channel()) {
@@ -39,5 +48,14 @@ public class InboundChannelHandler extends ChannelInboundHandlerAdapter {
         }
         ctx.flush();
         ctx.close();
+    }
+
+    private void updateAliveStatus(String userHash){
+        for(Channel c:channelGroup){
+            if(c.attr(this.userHash).get().equals(userHash)){
+                c.attr(isAlive).set(true);
+                logger.info("AliveTrue");
+            }
+        }
     }
 }

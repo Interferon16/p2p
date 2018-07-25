@@ -7,6 +7,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,12 +16,16 @@ public class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private HandlerType handlerType;
     private boolean handshakeTrue = false;
+    private AttributeKey<String> userHash;
 
-    public enum HandlerType{
+    public enum HandlerType {
         SERVER,
-        CLIENT};
+        CLIENT
+    }
 
-    public AbstractHandshakeHandler(ChannelGroup channelGroup,HandlerType handlerType) {
+    ;
+
+    public AbstractHandshakeHandler(ChannelGroup channelGroup, HandlerType handlerType) {
         this.channelGroup = channelGroup;
         this.handlerType = handlerType;
     }
@@ -28,15 +33,15 @@ public class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Message message = (Message) msg;
-        if(message.getType()== MessageType.HANDSHAKE){
-            boolean handshake = processingHandshake(message,ctx);
-            if(!handshake){
+        if (message.getType() == MessageType.HANDSHAKE) {
+            boolean handshake = processingHandshake(message, ctx);
+            if (!handshake) {
                 ctx.channel().close().awaitUninterruptibly();
-                logger.warn("Handshake with "+ctx.channel().remoteAddress().toString()+"not accepted, connection dropped");
+                logger.warn("Handshake with " + ctx.channel().remoteAddress().toString() + "not accepted, connection dropped");
             }
-        }else{
+        } else {
             ctx.channel().close().awaitUninterruptibly();
-            logger.warn("Handshake with "+ctx.channel().remoteAddress().toString()+" don't received, connection dropped");
+            logger.warn("Handshake with " + ctx.channel().remoteAddress().toString() + " don't received, connection dropped");
         }
         //ctx.fireChannelRead(msg);
     }
@@ -44,7 +49,7 @@ public class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (cause instanceof ReadTimeoutException) {
-            if (!this.handshakeTrue){
+            if (!this.handshakeTrue) {
                 logger.warn("Connection dropped by timeout");
                 ctx.channel().close().awaitUninterruptibly();
             }
@@ -53,12 +58,13 @@ public class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private boolean processingHandshake(Message message,ChannelHandlerContext ctx){
+    private boolean processingHandshake(Message message, ChannelHandlerContext ctx) {
+        ctx.channel().attr(userHash).set(message.getFrom());
         channelGroup.add(ctx.channel());
         logger.info("Channel add" + ctx.channel().toString());
         ctx.channel().pipeline().remove(ReadTimeoutHandler.class);
         this.handshakeTrue = true;
-        if(this.handlerType==HandlerType.SERVER){
+        if (this.handlerType == HandlerType.SERVER) {
             message.setMessage("Hello back");
             ctx.writeAndFlush(message);
             logger.info("Handshake received, sending back");

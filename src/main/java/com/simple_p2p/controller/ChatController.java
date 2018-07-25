@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 @Controller
 public class ChatController {
 
+    private String userHash;
+
     @Autowired
     private P2PServerControl p2PServerControl;
 

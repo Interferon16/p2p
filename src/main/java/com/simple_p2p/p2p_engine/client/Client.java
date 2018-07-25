@@ -1,7 +1,10 @@
 package com.simple_p2p.p2p_engine.client;
 
+import com.simple_p2p.entity.KnownUsers;
 import com.simple_p2p.p2p_engine.Utils.NetworkEnvironment;
 import com.simple_p2p.p2p_engine.channels_inits.ClientChannelInitializer;
+import com.simple_p2p.p2p_engine.server.Settings;
+import com.simple_p2p.repository.MessageTableRepository;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -9,31 +12,28 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import io.netty.util.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 
 import java.net.InetAddress;
+import java.security.Security;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class Client {
     private EventLoopGroup connectionsLoop;
-    private ChannelGroup channelGroup;
     private Bootstrap clientBootstrap;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private InetAddress localAddress;
-    private CopyOnWriteArrayList<Integer> messagesHashBuffer;
-    private SimpMessageSendingOperations simpMessagingTemplate;
+    private Settings settings;
 
 
-    public Client(ChannelGroup channelGroup, EventLoopGroup connectionsLoop,CopyOnWriteArrayList<Integer> messagesHashBuffer,SimpMessageSendingOperations simpMessagingTemplate) {
-        this.channelGroup = channelGroup;
+    public Client(EventLoopGroup connectionsLoop, Settings settings) {
+        this.settings=settings;
         this.connectionsLoop = connectionsLoop;
         this.localAddress = NetworkEnvironment.getLocalAddress();
-        this.messagesHashBuffer=messagesHashBuffer;
-        this.simpMessagingTemplate=simpMessagingTemplate;
-
     }
 
     public void run() throws Exception {
@@ -41,7 +41,7 @@ public class Client {
         clientBootstrap.group(connectionsLoop);
         clientBootstrap.channel(NioSocketChannel.class);
         clientBootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 500);
-        clientBootstrap.handler(new ClientChannelInitializer(channelGroup,messagesHashBuffer,simpMessagingTemplate));
+        clientBootstrap.handler(new ClientChannelInitializer(settings));
         logger.info("Client start");
         connectOnStart();
     }

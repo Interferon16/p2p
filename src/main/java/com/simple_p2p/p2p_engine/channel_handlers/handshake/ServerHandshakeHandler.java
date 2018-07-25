@@ -10,7 +10,7 @@ public class ServerHandshakeHandler extends AbstractHandshakeHandler {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public ServerHandshakeHandler(ChannelGroup channelGroup) {
-        super(channelGroup,HandlerType.SERVER);
+        super(channelGroup, HandlerType.SERVER);
     }
 
     @Override

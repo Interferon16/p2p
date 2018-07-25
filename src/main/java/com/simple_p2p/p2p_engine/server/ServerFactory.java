@@ -6,9 +6,9 @@ public class ServerFactory {
 
     private static Server thisServer = null;
 
-    public synchronized static Server getServerInstance(int port, SimpMessageSendingOperations simpMessagingTemplate){
+    public synchronized static Server getServerInstance(Settings settings){
         if(thisServer==null) {
-            thisServer = new Server(port,simpMessagingTemplate);
+            thisServer = new Server(settings);
             Thread serverThread = new Thread(thisServer, "serverThread");
             serverThread.start();
         }

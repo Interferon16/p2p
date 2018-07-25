@@ -4,5 +4,6 @@ public enum MessageType {
     TEXT,
     DATA,
     BOOTSTRAP,
-    HANDSHAKE
+    HANDSHAKE,
+    PING
 }
