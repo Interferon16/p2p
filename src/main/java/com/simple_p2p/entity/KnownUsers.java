@@ -14,7 +14,7 @@ public class KnownUsers {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "userHash",unique = true)
+    @Column(name = "userHash")
     private String userHash;
 
     @Column(name = "username")

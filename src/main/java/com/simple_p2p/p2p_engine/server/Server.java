@@ -23,7 +23,6 @@ public class Server implements Runnable {
 
     private int port;
     private Channel listenerChannel;
-    private ChannelGroup channelGroup;
     private Client client;
     private String myHash;
     private InetAddress localAddress;
@@ -131,10 +130,6 @@ public class Server implements Runnable {
 
     public Client getClient() {
         return client;
-    }
-
-    public ChannelGroup getChannelGroup() {
-        return channelGroup;
     }
 
     public int getPort() {

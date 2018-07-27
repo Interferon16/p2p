@@ -10,9 +10,11 @@ import io.netty.util.concurrent.DefaultEventExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 
+import javax.sql.DataSource;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @SpringBootApplication
@@ -38,6 +40,15 @@ public class SimpleP2P {
 	@Autowired
 	public P2PServerControl p2PServerControl(Settings settings){
 		Server server = ServerFactory.getServerInstance(settings);
-		return new P2PServerControlImpl(server);
+		return new P2PServerControlImpl(server,settings);
+	}
+
+	@Bean
+	public DataSource dataSource() {
+		DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+		dataSourceBuilder.driverClassName("org.sqlite.JDBC");
+		dataSourceBuilder.url("jdbc:sqlite:simple_p2p.db");
+		return dataSourceBuilder.build();
+
 	}
 }
