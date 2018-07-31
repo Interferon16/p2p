@@ -20,6 +20,7 @@ public class ClientHandshakeHandler extends AbstractHandshakeHandler {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         Message handshake = MessageFactory.createHandshakeInstance();
         handshake.setMessage("hello");
+        handshake.setFrom("124567aseesrt124dfsetrts");
         ctx.channel().writeAndFlush(handshake);
         logger.info("Sending handshake packet");
         super.channelActive(ctx);

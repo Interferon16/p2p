@@ -53,8 +53,9 @@ public class Client {
                 startPort++;
                 String address = "192.168.0."+i;
                 if(!address.equals(localAddress.getHostAddress())){
-                    connect(address,startPort);
+                    //connect(address,startPort);
                 }
+                connect(address,startPort);
             }
         }
     }

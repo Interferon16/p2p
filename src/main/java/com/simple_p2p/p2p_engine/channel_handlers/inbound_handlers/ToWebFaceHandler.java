@@ -2,6 +2,7 @@ package com.simple_p2p.p2p_engine.channel_handlers.inbound_handlers;
 
 import com.simple_p2p.model.ChatMessage;
 import com.simple_p2p.p2p_engine.Message.Message;
+import com.simple_p2p.p2p_engine.server.Settings;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
@@ -15,8 +16,8 @@ public class ToWebFaceHandler extends ChannelInboundHandlerAdapter {
 
     private SimpMessageSendingOperations simpMessagingTemplate;
 
-    public ToWebFaceHandler(SimpMessageSendingOperations simpMessagingTemplate){
-        this.simpMessagingTemplate=simpMessagingTemplate;
+    public ToWebFaceHandler(Settings settings){
+        this.simpMessagingTemplate=settings.getSprAppCtx().getBean(SimpMessageSendingOperations.class);
     }
 
 

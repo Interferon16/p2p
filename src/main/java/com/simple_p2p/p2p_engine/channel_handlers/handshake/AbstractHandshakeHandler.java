@@ -16,7 +16,7 @@ public class AbstractHandshakeHandler extends ChannelInboundHandlerAdapter {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private HandlerType handlerType;
     private boolean handshakeTrue = false;
-    private AttributeKey<String> userHash;
+    private AttributeKey<String> userHash = AttributeKey.valueOf("userHash");
 
     public enum HandlerType {
         SERVER,

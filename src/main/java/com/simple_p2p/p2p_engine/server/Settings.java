@@ -1,6 +1,7 @@
 package com.simple_p2p.p2p_engine.server;
 
 import io.netty.channel.group.ChannelGroup;
+import org.springframework.context.ApplicationContext;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 
 import java.net.InetAddress;
@@ -26,8 +27,8 @@ public class Settings {
     private InetAddress externalAddress;
     private int listener_port;
     private ChannelGroup connectedChannelGroup;
-    private SimpMessageSendingOperations messagingTemplate;
     private CopyOnWriteArrayList<Integer> messagesHashBuffer;
+    private ApplicationContext sprAppCtx;
 
     public int getListener_port() {
         return listener_port;
@@ -43,14 +44,6 @@ public class Settings {
 
     public void setConnectedChannelGroup(ChannelGroup connectedChannelGroup) {
         this.connectedChannelGroup = connectedChannelGroup;
-    }
-
-    public SimpMessageSendingOperations getMessagingTemplate() {
-        return messagingTemplate;
-    }
-
-    public void setMessagingTemplate(SimpMessageSendingOperations messagingTemplate) {
-        this.messagingTemplate = messagingTemplate;
     }
 
     public CopyOnWriteArrayList<Integer> getMessagesHashBuffer() {
@@ -91,5 +84,13 @@ public class Settings {
 
     public void setExternalAddress(InetAddress externalAddress) {
         this.externalAddress = externalAddress;
+    }
+
+    public ApplicationContext getSprAppCtx() {
+        return sprAppCtx;
+    }
+
+    public void setSprAppCtx(ApplicationContext sprAppCtx) {
+        this.sprAppCtx = sprAppCtx;
     }
 }

@@ -1,7 +1,12 @@
 package com.simple_p2p.p2p_engine.Message;
 
+import com.simple_p2p.entity.KnownUsers;
+
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class Message implements Serializable {
 
@@ -10,6 +15,7 @@ public class Message implements Serializable {
     private String to;
     private String message;
     private byte[] dataBuff;
+    private List<KnownUsers> knownNode;
     private int dataBuffCapacity;
     private int hash;
     private long timeStamp;
@@ -87,31 +93,32 @@ public class Message implements Serializable {
         return timeStamp;
     }
 
+    public List<KnownUsers> getKnownNode() {
+        return knownNode;
+    }
+
+    public void setKnownNode(List<KnownUsers> knownNode) {
+        this.knownNode = knownNode;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Message message1 = (Message) o;
-
-        if (dataBuffCapacity != message1.dataBuffCapacity) return false;
-        if (timeStamp != message1.timeStamp) return false;
-        if (type != message1.type) return false;
-        if (from != null ? !from.equals(message1.from) : message1.from != null) return false;
-        if (to != null ? !to.equals(message1.to) : message1.to != null) return false;
-        if (message != null ? !message.equals(message1.message) : message1.message != null) return false;
-        return Arrays.equals(dataBuff, message1.dataBuff);
+        return dataBuffCapacity == message1.dataBuffCapacity &&
+                hash == message1.hash &&
+                timeStamp == message1.timeStamp &&
+                type == message1.type &&
+                Objects.equals(from, message1.from) &&
+                Objects.equals(to, message1.to) &&
+                Objects.equals(message, message1.message) &&
+                Arrays.equals(dataBuff, message1.dataBuff) &&
+                Objects.equals(knownNode, message1.knownNode);
     }
 
     @Override
     public int hashCode() {
-        int result = type != null ? type.hashCode() : 0;
-        result = 31 * result + (from != null ? from.hashCode() : 0);
-        result = 31 * result + (to != null ? to.hashCode() : 0);
-        result = 31 * result + (message != null ? message.hashCode() : 0);
-        result = 31 * result + Arrays.hashCode(dataBuff);
-        result = 31 * result + dataBuffCapacity;
-        result = 31 * result + (int) (timeStamp ^ (timeStamp >>> 32));
-        return result;
+        return Objects.hash(type, from, to, message, dataBuff, knownNode, dataBuffCapacity, hash, timeStamp);
     }
 }

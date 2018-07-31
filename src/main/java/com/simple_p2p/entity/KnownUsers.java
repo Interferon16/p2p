@@ -1,52 +1,37 @@
 package com.simple_p2p.entity;
 
-import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "Known_Users")
-public class KnownUsers {
+@Table(name = "KnownUsers")
+public class KnownUsers implements Serializable{
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    @Column(name = "id")
-    private int id;
-
+    //@GeneratedValue(strategy=GenerationType.AUTO)
     @Column(name = "userHash")
     private String userHash;
 
     @Column(name = "username")
     private String userName;
 
-    @Column(name = "ipAddress")
-    private String ipAddress;
+    @Column(name = "internalIpAddress")
+    private String internalIpAddress;
+
+    @Column(name = "externalIpAddress")
+    private String externalIpAddress;
 
     public KnownUsers() {
 
     }
 
-    public KnownUsers(String userHash, String userName, String message){
+    public KnownUsers(String userHash, String userName, String internalIpAddress, String externalIpAddress){
         this.userHash = userHash;
         this.userName = userName;
-        this.ipAddress = message;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getMessage() {
-        return ipAddress;
-    }
-
-    public void setMessage(String message) {
-        this.ipAddress = message;
+        this.internalIpAddress = internalIpAddress;
+        this.externalIpAddress = externalIpAddress;
     }
 
     public String getUserHash() {
@@ -57,20 +42,43 @@ public class KnownUsers {
         this.userHash = userHash;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getInternalIpAddress() {
+        return internalIpAddress;
+    }
+
+    public void setInternalIpAddress(String internalIpAddress) {
+        this.internalIpAddress = internalIpAddress;
+    }
+
+    public String getExternalIpAddress() {
+        return externalIpAddress;
+    }
+
+    public void setExternalIpAddress(String externalIpAddress) {
+        this.externalIpAddress = externalIpAddress;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         KnownUsers that = (KnownUsers) o;
-        return id == that.id &&
-                Objects.equals(userHash, that.userHash) &&
+        return Objects.equals(userHash, that.userHash) &&
                 Objects.equals(userName, that.userName) &&
-                Objects.equals(ipAddress, that.ipAddress);
+                Objects.equals(internalIpAddress, that.internalIpAddress) &&
+                Objects.equals(externalIpAddress, that.externalIpAddress);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(id, userHash, userName, ipAddress);
+        return Objects.hash(userHash, userName, internalIpAddress, externalIpAddress);
     }
 }

@@ -10,7 +10,7 @@ import java.util.TimerTask;
 public class RefreshAliveStatusFromChannels extends TimerTask{
 
     private ChannelGroup channelGroup;
-    private AttributeKey<Boolean> isAlive = AttributeKey.newInstance("isAlive");
+    private AttributeKey<Boolean> isAlive = AttributeKey.valueOf("isAlive");
 
     public RefreshAliveStatusFromChannels(ChannelGroup channelGroup){
         this.channelGroup=channelGroup;

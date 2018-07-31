@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 
@@ -27,9 +28,9 @@ public class SimpleP2P {
 
 	@Bean
 	@Autowired
-	public Settings buildSettings(SimpMessageSendingOperations messagingTemplate){
+	public Settings buildSettings(SimpMessageSendingOperations messagingTemplate, ApplicationContext appCtx){
 		Settings settings=Settings.getInstatce();
-		settings.setMessagingTemplate(messagingTemplate);
+		settings.setSprAppCtx(appCtx);
 		settings.setListener_port(16161);
 		settings.setConnectedChannelGroup(new DefaultChannelGroup(new DefaultEventExecutor()));
 		settings.setMessagesHashBuffer(new CopyOnWriteArrayList<>());

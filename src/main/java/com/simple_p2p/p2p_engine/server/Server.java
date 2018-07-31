@@ -13,6 +13,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,8 @@ public class Server implements Runnable {
     private InetAddress externalAddress;
     private Settings settings;
     private Timer timeEvents;
+    private AttributeKey<String> userHash = AttributeKey.newInstance("userHash");
+    private AttributeKey<Boolean> isAlive = AttributeKey.newInstance("isAlive");
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -104,8 +107,8 @@ public class Server implements Runnable {
             logger.info("Server start");
             client = startClient(connectionsLoop, settings);
 
-            timeEvents.scheduleAtFixedRate(new SendAliveMessageEvent(settings.getConnectedChannelGroup()), 5000, 5000);
-            timeEvents.scheduleAtFixedRate(new RefreshAliveStatusFromChannels(settings.getConnectedChannelGroup()), 20000, 20000);
+            timeEvents.scheduleAtFixedRate(new SendAliveMessageEvent(settings.getConnectedChannelGroup()), 20000, 20000);
+            //timeEvents.scheduleAtFixedRate(new RefreshAliveStatusFromChannels(settings.getConnectedChannelGroup()), 20000, 20000);
 
 
             listenerChannel.closeFuture().sync();
