@@ -23,14 +23,8 @@ public class SendAliveMessageEvent extends TimerTask{
         Message bootMessage = MessageFactory.createBootstrapInstance();
         bootMessage.setKnownNode(knownUsers);
         channelGroup.writeAndFlush(bootMessage);
+
         channelGroup.writeAndFlush(MessageFactory.createPingInstance());
-        for (Channel c:channelGroup){
-            System.out.println(c.toString());
-        }
-        for(KnownUsers k:knownUsers){
-            System.out.println(k.getUserHash());
-        }
-        System.out.println("send bootstrap");
     }
 
     private List<KnownUsers> createDummyList(){

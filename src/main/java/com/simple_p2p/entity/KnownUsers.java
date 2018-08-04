@@ -1,16 +1,22 @@
 package com.simple_p2p.entity;
 
 
+import org.springframework.data.domain.Persistable;
+import org.springframework.lang.Nullable;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
 @Table(name = "KnownUsers")
-public class KnownUsers implements Serializable{
+public class KnownUsers implements Serializable {
 
     @Id
-    //@GeneratedValue(strategy=GenerationType.AUTO)
+/*    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "Id")
+    private int Id;*/
+
     @Column(name = "userHash")
     private String userHash;
 
@@ -27,7 +33,7 @@ public class KnownUsers implements Serializable{
 
     }
 
-    public KnownUsers(String userHash, String userName, String internalIpAddress, String externalIpAddress){
+    public KnownUsers(String userHash, String userName, String internalIpAddress, String externalIpAddress) {
         this.userHash = userHash;
         this.userName = userName;
         this.internalIpAddress = internalIpAddress;
@@ -82,3 +88,5 @@ public class KnownUsers implements Serializable{
         return Objects.hash(userHash, userName, internalIpAddress, externalIpAddress);
     }
 }
+
+

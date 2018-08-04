@@ -4,6 +4,7 @@ import com.simple_p2p.p2p_engine.channel_handlers.inbound_handlers.DuplicatedMes
 import com.simple_p2p.p2p_engine.channel_handlers.inbound_handlers.InboundChannelHandler;
 import com.simple_p2p.p2p_engine.channel_handlers.inbound_handlers.ToWebFaceHandler;
 import com.simple_p2p.p2p_engine.channel_handlers.handshake.ClientHandshakeHandler;
+import com.simple_p2p.p2p_engine.channel_handlers.outbound_handlers.OutboundPacketHandler;
 import com.simple_p2p.p2p_engine.server.Settings;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -28,5 +29,6 @@ public class ClientChannelInitializer extends ChannelInitializer {
         channel.pipeline().addLast(new DuplicatedMessageHandler(settings.getMessagesHashBuffer()));
         channel.pipeline().addLast(new InboundChannelHandler(settings));
         channel.pipeline().addLast(new ToWebFaceHandler(settings));
+        channel.pipeline().addLast(new OutboundPacketHandler(settings));
     }
 }

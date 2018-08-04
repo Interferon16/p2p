@@ -1,5 +1,6 @@
 package com.simple_p2p.p2p_engine.channel_handlers.inbound_handlers;
 
+import com.simple_p2p.entity.KnownUsers;
 import com.simple_p2p.p2p_engine.Message.Message;
 import com.simple_p2p.p2p_engine.enginerepository.KnownUsersTableRepository;
 import com.simple_p2p.p2p_engine.server.Settings;
@@ -11,6 +12,7 @@ import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+
 
 public class InboundChannelHandler extends ChannelInboundHandlerAdapter {
     private ChannelGroup channelGroup;
@@ -29,11 +31,16 @@ public class InboundChannelHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof Message) {
             Message message = (Message) msg;
-            logger.info(message.getMessage());
-            switch (message.getType()){
-                case PING:updateAliveStatus(message.getFrom());break;
-                case BOOTSTRAP:updateDBFromBootstrap(message);break;
-                default:sendToAll(msg,ctx);
+            logger.info("Message:" + message.getMessage());
+            switch (message.getType()) {
+                case PING:
+                    updateAliveStatus(message.getFrom());
+                    break;
+                case BOOTSTRAP:
+                    updateDBFromBootstrap(message);
+                    break;
+                default:
+                    sendToAll(msg, ctx);
             }
         }
     }
@@ -49,23 +56,27 @@ public class InboundChannelHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-    private void updateAliveStatus(String userHash){
+    private void updateAliveStatus(String userHash) {
         logger.info("ping");
-        for(Channel c:channelGroup){
-            if(c.attr(this.userHash).get().equals(userHash)){
+        for (Channel c : channelGroup) {
+            if (c.attr(this.userHash).get().equals(userHash)) {
                 c.attr(isAlive).set(true);
-                logger.info("AliveTrue");
             }
         }
     }
 
-    private void updateDBFromBootstrap(Message message){
+    private void updateDBFromBootstrap(Message message) {
         logger.info("get bootstrap");
-        KnownUsersTableRepository knownUsersTableRepository=springApplicationContext.getBean(KnownUsersTableRepository.class);
-        knownUsersTableRepository.saveAll(message.getKnownNode());
+        logger.info("From:" + message.getFrom());
+        KnownUsersTableRepository knownUsersTableRepository = springApplicationContext.getBean(KnownUsersTableRepository.class);
+        for (KnownUsers k : message.getKnownNode()) {
+            if (!knownUsersTableRepository.existsById(k.getUserHash())) {
+                knownUsersTableRepository.saveAndFlush(k);
+            }
+        }
     }
 
-    private void sendToAll(Object msg,ChannelHandlerContext ctx){
+    private void sendToAll(Object msg, ChannelHandlerContext ctx) {
         for (Channel c : channelGroup) {
             if (c != ctx.channel()) {
                 c.writeAndFlush(msg);
