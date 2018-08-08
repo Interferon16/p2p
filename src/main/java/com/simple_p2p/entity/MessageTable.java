@@ -6,7 +6,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "message_history")
-public class MessageTable {
+public class MessageTable implements CommonEntity {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -30,6 +30,11 @@ public class MessageTable {
         this.created = created;
         this.userName = userName;
         this.message = message;
+    }
+
+    @Override
+    public Object getUnique() {
+        return created;
     }
 
     public LocalDateTime getCreated() {

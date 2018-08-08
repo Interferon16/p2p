@@ -11,6 +11,11 @@ import io.netty.channel.group.ChannelGroup;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 
 public class P2PServerControlImpl implements P2PServerControl {
     private Server server;
@@ -31,5 +36,12 @@ public class P2PServerControlImpl implements P2PServerControl {
             message.setMessage(chatMessage.getContent());
             connectedChannelsGroup.writeAndFlush(message);
         }
+    }
+
+    public void shareDirectory(Path path) throws FileNotFoundException {
+        if(Files.notExists(path)){
+            throw new FileNotFoundException("Directory no Exist");
+        }
+
     }
 }

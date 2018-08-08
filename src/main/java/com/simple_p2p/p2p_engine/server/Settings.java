@@ -1,5 +1,6 @@
 package com.simple_p2p.p2p_engine.server;
 
+import com.simple_p2p.p2p_engine.enginerepository.DBWriteHandler;
 import io.netty.channel.group.ChannelGroup;
 import org.springframework.context.ApplicationContext;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -13,22 +14,21 @@ public class Settings {
         public static final Settings HOLDER_INSTANCE = new Settings();
     }
 
-    public static Settings getInstatce() {
+    public static Settings getInstance() {
         return SettingsHolder.HOLDER_INSTANCE;
     }
 
-    public Settings() {
-        this.listener_port = 16000; //default listener port
-    }
+    private Settings() {}
 
     private String myHash;
     private InetAddress localAddress;
     private String localMacAddress;
     private InetAddress externalAddress;
-    private int listener_port;
+    private int listener_port = 16161;
     private ChannelGroup connectedChannelGroup;
     private CopyOnWriteArrayList<Integer> messagesHashBuffer;
     private ApplicationContext sprAppCtx;
+    private DBWriteHandler dbWriteHandler;
 
     public int getListener_port() {
         return listener_port;
@@ -92,5 +92,13 @@ public class Settings {
 
     public void setSprAppCtx(ApplicationContext sprAppCtx) {
         this.sprAppCtx = sprAppCtx;
+    }
+
+    public DBWriteHandler getDbWriteHandler() {
+        return dbWriteHandler;
+    }
+
+    public void setDbWriteHandler(DBWriteHandler dbWriteHandler) {
+        this.dbWriteHandler = dbWriteHandler;
     }
 }

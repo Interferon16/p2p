@@ -2,6 +2,7 @@ package com.simple_p2p.p2p_engine.channel_handlers.inbound_handlers;
 
 import com.simple_p2p.entity.KnownUsers;
 import com.simple_p2p.p2p_engine.Message.Message;
+import com.simple_p2p.p2p_engine.enginerepository.DBWriteHandler;
 import com.simple_p2p.p2p_engine.enginerepository.KnownUsersTableRepository;
 import com.simple_p2p.p2p_engine.server.Settings;
 import io.netty.channel.Channel;
@@ -11,7 +12,6 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 
 
 public class InboundChannelHandler extends ChannelInboundHandlerAdapter {
@@ -19,12 +19,12 @@ public class InboundChannelHandler extends ChannelInboundHandlerAdapter {
     private AttributeKey<String> userHash = AttributeKey.valueOf("userHash");
     private AttributeKey<Boolean> isAlive = AttributeKey.valueOf("isAilive");
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private ApplicationContext springApplicationContext;
+    private Settings settings;
 
 
     public InboundChannelHandler(Settings settings) {
         this.channelGroup = settings.getConnectedChannelGroup();
-        this.springApplicationContext = settings.getSprAppCtx();
+        this.settings = settings;
     }
 
     @Override
@@ -66,12 +66,13 @@ public class InboundChannelHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void updateDBFromBootstrap(Message message) {
+        DBWriteHandler dbWriteHandler = settings.getDbWriteHandler();
+        KnownUsersTableRepository knownUsersTableRepository = settings.getSprAppCtx().getBean(KnownUsersTableRepository.class);
         logger.info("get bootstrap");
         logger.info("From:" + message.getFrom());
-        KnownUsersTableRepository knownUsersTableRepository = springApplicationContext.getBean(KnownUsersTableRepository.class);
-        for (KnownUsers k : message.getKnownNode()) {
-            if (!knownUsersTableRepository.existsById(k.getUserHash())) {
-                knownUsersTableRepository.saveAndFlush(k);
+        if (!message.getKnownNode().isEmpty()) {
+            for (KnownUsers k : message.getKnownNode()) {
+                dbWriteHandler.addToDB(knownUsersTableRepository, k);
             }
         }
     }

@@ -6,6 +6,7 @@ import com.simple_p2p.p2p_engine.channels_inits.ServerChannelInitializer;
 import com.simple_p2p.p2p_engine.client.Client;
 import com.simple_p2p.p2p_engine.timeevents.RefreshAliveStatusFromChannels;
 import com.simple_p2p.p2p_engine.timeevents.SendAliveMessageEvent;
+import com.simple_p2p.p2p_engine.timeevents.SendBootstrapMessageEvent;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -107,7 +108,8 @@ public class Server implements Runnable {
             logger.info("Server start");
             client = startClient(connectionsLoop, settings);
 
-            timeEvents.scheduleAtFixedRate(new SendAliveMessageEvent(settings.getConnectedChannelGroup()), 20000, 20000);
+            timeEvents.scheduleAtFixedRate(new SendAliveMessageEvent(settings.getConnectedChannelGroup()), 5000, 5000);
+            timeEvents.scheduleAtFixedRate(new SendBootstrapMessageEvent(settings.getConnectedChannelGroup()), 10000, 1000);
             //timeEvents.scheduleAtFixedRate(new RefreshAliveStatusFromChannels(settings.getConnectedChannelGroup()), 20000, 20000);
 
 

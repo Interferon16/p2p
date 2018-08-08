@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "KnownUsers")
-public class KnownUsers implements Serializable {
+public class KnownUsers implements Serializable,CommonEntity {
 
     @Id
 /*    @GeneratedValue(strategy = GenerationType.AUTO)
@@ -38,6 +38,11 @@ public class KnownUsers implements Serializable {
         this.userName = userName;
         this.internalIpAddress = internalIpAddress;
         this.externalIpAddress = externalIpAddress;
+    }
+
+    @Override
+    public Object getUnique() {
+        return userHash;
     }
 
     public String getUserHash() {
