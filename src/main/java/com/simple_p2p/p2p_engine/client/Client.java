@@ -3,6 +3,7 @@ package com.simple_p2p.p2p_engine.client;
 import com.simple_p2p.entity.KnownUsers;
 import com.simple_p2p.p2p_engine.Utils.NetworkEnvironment;
 import com.simple_p2p.p2p_engine.channels_inits.ClientChannelInitializer;
+import com.simple_p2p.p2p_engine.fiile_work.FileShared;
 import com.simple_p2p.p2p_engine.server.Settings;
 import com.simple_p2p.repository.MessageTableRepository;
 import io.netty.bootstrap.Bootstrap;
@@ -44,6 +45,7 @@ public class Client {
         clientBootstrap.handler(new ClientChannelInitializer(settings));
         logger.info("Client start");
         connectOnStart();
+        FileShared.testrun(settings);
     }
 
     private void connectOnStart(){
